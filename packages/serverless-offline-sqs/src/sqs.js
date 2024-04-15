@@ -49,6 +49,17 @@ class SQS {
   }
 
   _create(functionKey, rawSqsEventDefinition) {
+    const {queueName} = this.options;
+
+    if (queueName) {
+      rawSqsEventDefinition.queueName = queueName;
+    } else {
+      // We don't receive queueName here, so the idea of this fix is to establish a
+      // convention: we concat a function name (testQueueWorker) from serverless lift
+      // with "Queue". You can see all worker queues at http://localhost:9325/
+      rawSqsEventDefinition.queueName = `${functionKey}Queue`
+    }
+
     const sqsEvent = new SQSEventDefinition(
       rawSqsEventDefinition,
       this.options.region,
